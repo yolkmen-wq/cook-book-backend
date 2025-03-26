@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"bytes"
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories"
 	"encoding/json"
 	"errors"
 	"fmt"

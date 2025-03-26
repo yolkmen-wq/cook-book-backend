@@ -1,14 +1,14 @@
 package system_mgmt_srv
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories/system_mgmt_repo"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories/system_mgmt_repo"
 )
 
 type UserMgmtService interface {
-	GetAdminUserList(page, size int, username string, nickname string, status interface{}) ([]models.AdminUser, int64, error)
+	GetAdminUserList(req models.GetUsersRequest) ([]models.AdminUserMgmt, int64, int, int, error)
 	DeleteUser(id int64) error
-	AddUser(info models.AdminUser) error
+	AddUser(info models.AdminUserMgmt) error
 	UpdateUser(info models.AdminUser) error
 	GetRoleList(name string, id int64) ([]models.Role, error)
 	UpdateUserRoles(id int64, roleIds []int64) error
@@ -23,8 +23,8 @@ func NewUserMgmtService(userMgmtRepo *system_mgmt_repo.UserMgmtRepository) UserM
 }
 
 // GetAdminUserList function is used to get admin user list
-func (ums *userMgmtService) GetAdminUserList(page, size int, username string, nickname string, status interface{}) ([]models.AdminUser, int64, error) {
-	return ums.userMgmtRepo.GetAdminUserList(page, size, username, nickname, status)
+func (ums *userMgmtService) GetAdminUserList(req models.GetUsersRequest) ([]models.AdminUserMgmt, int64, int, int, error) {
+	return ums.userMgmtRepo.GetAdminUserList(req)
 }
 
 // DeleteUser function is used to delete user
@@ -33,7 +33,7 @@ func (ums *userMgmtService) DeleteUser(id int64) error {
 }
 
 // AddUser function is used to add user
-func (ums *userMgmtService) AddUser(info models.AdminUser) error {
+func (ums *userMgmtService) AddUser(info models.AdminUserMgmt) error {
 	return ums.userMgmtRepo.AddUser(info)
 }
 

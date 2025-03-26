@@ -1,7 +1,7 @@
 package system_mgmt_repo
 
 import (
-	"cook-book-backEnd/models"
+	"cook-book-admin-backend/models"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -15,34 +15,56 @@ func NewUserMgmtRepository(db *gorm.DB) *UserMgmtRepository {
 }
 
 // 获取用户列表
-func (lr *UserMgmtRepository) GetAdminUserList(page, size int, username string, nickname string, status interface{}) ([]models.AdminUser, int64, error) {
-	var users []models.AdminUser
+func (lr *UserMgmtRepository) GetAdminUserList(req models.GetUsersRequest) ([]models.AdminUserMgmt, int64, int, int, error) {
+	var users []models.AdminUserMgmt
 	var total int64
-	var db = lr.db
+
 	// 构建查询条件
-	if status != "" && status != nil {
-		db = db.Where("status = ?", status)
+	db := lr.db.Table("admin_users")
+	if req.Username != "" {
+		db = db.Where("username LIKE ?", "%"+req.Username+"%")
 	}
 
-	err := db.Where("username LIKE ? AND nickname LIKE ? ", "%"+username+"%", "%"+nickname+"%").Limit(size).Offset((page - 1) * size).Find(&users).Count(&total).Error
-	if err != nil {
-		fmt.Println("获取用户列表失败", err)
-		return nil, 0, err
+	if req.Nickname != "" {
+		db = db.Where("nickname LIKE ?", "%"+req.Nickname+"%")
 	}
 
-	return users, total, nil
+	if req.Status != nil && req.Status != "" {
+		db = db.Where("status = ?", req.Status)
+	}
+
+	// 计算总数
+	if err := db.Count(&total).Error; err != nil {
+		fmt.Println("获取用户总数失败", err)
+		return nil, 0, 0, 0, err
+	}
+
+	// 获取分页用户列表
+	if req.PageNum != 0 && req.PageSize != 0 {
+		if err := db.Limit(req.PageSize).Offset((req.PageNum - 1) * req.PageSize).Find(&users).Error; err != nil {
+			fmt.Println("获取用户列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	} else {
+		if err := db.Find(&users).Error; err != nil {
+			fmt.Println("获取用户列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	}
+
+	return users, total, req.PageSize, req.PageNum, nil
 }
 
 // 删除用户
 func (lr *UserMgmtRepository) DeleteUser(id int64) error {
-	var user models.AdminUser
+	var user models.AdminUserMgmt
 	var db = lr.db
 	// 构建查询条件
 	if id == 0 {
 		fmt.Println("删除用户失败，用户ID不能为空")
 		return fmt.Errorf("删除用户失败，用户ID不能为空")
 	}
-	db = db.Model(&user).Where("user_id = ?", id).Delete(&user)
+	db = db.Table("admin_users").Where("user_id = ?", id).Delete(&user)
 	if err := db.Error; err != nil {
 		fmt.Println("删除用户失败", err)
 		return err
@@ -51,8 +73,7 @@ func (lr *UserMgmtRepository) DeleteUser(id int64) error {
 }
 
 // 新增用户
-func (lr *UserMgmtRepository) AddUser(userInfo models.AdminUser) error {
-	var user models.AdminUser
+func (lr *UserMgmtRepository) AddUser(userInfo models.AdminUserMgmt) error {
 	var db = lr.db
 	// 构建查询条件
 	username := userInfo.Username
@@ -75,7 +96,7 @@ func (lr *UserMgmtRepository) AddUser(userInfo models.AdminUser) error {
 		fmt.Println("新增用户失败，状态不能为空")
 		return fmt.Errorf("新增用户失败，状态不能为空")
 	}
-	db = db.Create(&user)
+	db = db.Table("admin_users").Create(&userInfo)
 	if err := db.Error; err != nil {
 		fmt.Println("新增用户失败", err)
 		return err

@@ -1,8 +1,8 @@
 package system_mon_ctrl
 
 import (
-	"cook-book-backEnd/config"
-	"cook-book-backEnd/services/system_mon_srv"
+	"cook-book-admin-backend/config"
+	"cook-book-admin-backend/services/system_mon_srv"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

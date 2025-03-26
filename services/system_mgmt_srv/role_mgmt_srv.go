@@ -1,16 +1,17 @@
 package system_mgmt_srv
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories/system_mgmt_repo"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories/system_mgmt_repo"
 )
 
 type RoleMgmtService interface {
-	GetRoleList(searchInfo models.GetRolesRequest) ([]models.Role, int64, error)
+	GetRoleList(searchInfo models.GetRolesRequest) ([]models.Role, int64, int, int, error)
 	UpdateRole(roleInfo models.Role) error
 	CreateRole(roleName, code string) error
 	DeleteRole(id int64) error
 	GetRoleMenuListByRoleId(roleId int64) ([]int64, error)
+	GetRoleCanAssignMenuList() ([]models.Menu, error)
 	SaveRoleMenuPermission(roleId int64, menuIds []int64) error
 }
 
@@ -25,7 +26,7 @@ func NewRoleMgmtService(roleMgmtRepo *system_mgmt_repo.RoleMgmtRepository) RoleM
 }
 
 // GetRoleList get role list
-func (s *roleMgmtService) GetRoleList(searchInfo models.GetRolesRequest) ([]models.Role, int64, error) {
+func (s *roleMgmtService) GetRoleList(searchInfo models.GetRolesRequest) ([]models.Role, int64, int, int, error) {
 	return s.roleMgmtRepo.GetRoleList(searchInfo)
 }
 
@@ -52,4 +53,9 @@ func (s *roleMgmtService) GetRoleMenuListByRoleId(roleId int64) ([]int64, error)
 // SaveRoleMenuPermission save role menu permission
 func (s *roleMgmtService) SaveRoleMenuPermission(roleId int64, menuIds []int64) error {
 	return s.roleMgmtRepo.SaveRoleMenuPermission(roleId, menuIds)
+}
+
+// GetRoleCanAssignMenuList get role can assign menu list
+func (s *roleMgmtService) GetRoleCanAssignMenuList() ([]models.Menu, error) {
+	return s.roleMgmtRepo.GetRoleCanAssignMenuList()
 }

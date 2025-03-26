@@ -1,8 +1,8 @@
 package system_mgmt_srv
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories/system_mgmt_repo"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories/system_mgmt_repo"
 )
 
 type MenuMgmtService interface {

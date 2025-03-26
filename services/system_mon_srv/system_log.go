@@ -1,8 +1,8 @@
 package system_mon_srv
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories/system_mon_repo"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories/system_mon_repo"
 )
 
 type SystemLogService interface {

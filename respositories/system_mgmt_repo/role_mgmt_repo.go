@@ -1,7 +1,7 @@
 package system_mgmt_repo
 
 import (
-	"cook-book-backEnd/models"
+	"cook-book-admin-backend/models"
 	"fmt"
 	"gorm.io/gorm"
 	"time"
@@ -16,39 +16,49 @@ func NewRoleMgmtRepository(db *gorm.DB) *RoleMgmtRepository {
 }
 
 // 获取角色列表
-func (lr *RoleMgmtRepository) GetRoleList(searchInfo models.GetRolesRequest) ([]models.Role, int64, error) {
+func (lr *RoleMgmtRepository) GetRoleList(req models.GetRolesRequest) ([]models.Role, int64, int, int, error) {
 	var roles []models.Role
-	var db = lr.db
-	var count int64
+	var total int64
 
 	// 构建查询条件
-	if searchInfo.ID != nil {
-		fmt.Println("id", *searchInfo.ID)
-		db = db.Joins("LEFT JOIN user_roles ON user_roles.role_id = roles.role_id").Where("user_roles.user_id = ?", *searchInfo.ID).Count(&count)
+	db := lr.db.Table("roles")
+
+	if req.ID != nil {
+		db = db.Joins("LEFT JOIN user_roles ON user_roles.role_id = roles.role_id").Where("user_roles.user_id = ?", *req.ID)
 	}
 
-	if searchInfo.Name != "" {
-		fmt.Println("name", searchInfo.Name)
-		db = db.Where("role_name like ?", "%"+searchInfo.Name+"%")
+	if req.Name != "" {
+		db = db.Where("role_name like ?", "%"+req.Name+"%")
 	}
 
-	if searchInfo.Code != "" {
-		fmt.Println("code", searchInfo.Code)
-		db = db.Where("role_code like ?", "%"+searchInfo.Code+"%")
+	if req.Code != "" {
+		db = db.Where("role_code like ?", "%"+req.Code+"%")
 	}
 
-	if searchInfo.Status != nil && searchInfo.Status != "" {
-		fmt.Println("status", searchInfo.Status)
-		db = db.Where("role_status = ?", searchInfo.Status)
+	if req.Status != nil && req.Status != "" {
+		db = db.Where("role_status = ?", req.Status)
 	}
 
-	db = db.Table("roles").Find(&roles)
-	fmt.Println("roles", roles)
-	if err := db.Error; err != nil {
-		fmt.Println("获取角色列表失败", err)
-		return nil, 0, err
+	// 计算总数
+	if err := db.Count(&total).Error; err != nil {
+		fmt.Println("获取角色总数失败", err)
+		return nil, 0, 0, 0, err
 	}
-	return roles, count, nil
+
+	// 获取分页角色列表
+	if req.PageNum != 0 && req.PageSize != 0 {
+		if err := db.Limit(req.PageSize).Offset((req.PageNum - 1) * req.PageSize).Find(&roles).Error; err != nil {
+			fmt.Println("获取角色列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	} else {
+		if err := db.Find(&roles).Error; err != nil {
+			fmt.Println("获取角色列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	}
+
+	return roles, total, req.PageNum, req.PageSize, nil
 
 }
 
@@ -102,7 +112,7 @@ func (lr *RoleMgmtRepository) CreateRole(roleName, code string) error {
 	return nil
 }
 
-// 获取菜单列表
+// 获取角色权限菜单列表
 func (lr *RoleMgmtRepository) GetRoleMenuListByRoleId(roleId int64) ([]int64, error) {
 	var roleMenus []models.RoleMenu
 	var menusId []int64
@@ -118,6 +128,18 @@ func (lr *RoleMgmtRepository) GetRoleMenuListByRoleId(roleId int64) ([]int64, er
 	fmt.Println("menusId", menusId)
 
 	return menusId, nil
+}
+
+// 获取角色可分配的菜单列表
+func (lr *RoleMgmtRepository) GetRoleCanAssignMenuList() ([]models.Menu, error) {
+	var menus []models.Menu
+
+	err := lr.db.Table("menus").Select("id, parent_id, menu_type, title").Find(&menus).Error
+	if err != nil {
+		fmt.Println("获取菜单列失败", err)
+		return nil, err
+	}
+	return menus, nil
 }
 
 // 保存角色菜单权限

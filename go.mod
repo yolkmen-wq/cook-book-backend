@@ -1,4 +1,4 @@
-module cook-book-backEnd
+module cook-book-admin-backend
 
 go 1.23.4
 

@@ -1,12 +1,12 @@
 package system_mon_srv
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories/system_mon_repo"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories/system_mon_repo"
 )
 
 type OnlineUserService interface {
-	GetOnlineUsers() ([]models.AdminUser, int64, error)
+	GetOnlineUsers(req models.GetUsersRequest) ([]models.AdminUserMgmt, int64, int, int, error)
 }
 
 type onlineUserService struct {
@@ -19,6 +19,6 @@ func NewOnlineUserService(repo *system_mon_repo.OnlineUserRepository) OnlineUser
 	}
 }
 
-func (s *onlineUserService) GetOnlineUsers() ([]models.AdminUser, int64, error) {
-	return s.repo.GetOnlineUsers()
+func (s *onlineUserService) GetOnlineUsers(req models.GetUsersRequest) ([]models.AdminUserMgmt, int64, int, int, error) {
+	return s.repo.GetOnlineUsers(req)
 }

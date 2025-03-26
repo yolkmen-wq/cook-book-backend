@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"cook-book-backEnd/controllers"
-	"cook-book-backEnd/respositories"
-	"cook-book-backEnd/services"
+	"cook-book-admin-backend/controllers"
+	"cook-book-admin-backend/respositories"
+	"cook-book-admin-backend/services"
 	"github.com/gin-gonic/gin"
 )
 

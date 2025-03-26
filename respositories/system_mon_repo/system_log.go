@@ -1,7 +1,7 @@
 package system_mon_repo
 
 import (
-	"cook-book-backEnd/models"
+	"cook-book-admin-backend/models"
 	"gorm.io/gorm"
 )
 

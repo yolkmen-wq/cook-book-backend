@@ -1,7 +1,7 @@
 package respositories
 
 import (
-	"cook-book-backEnd/models"
+	"cook-book-admin-backend/models"
 	"fmt"
 	"gorm.io/gorm"
 	"time"
@@ -73,7 +73,7 @@ func (lr *UserRepository) FindAdminUser(adminUser models.AdminUser) (*models.Adm
 	}
 
 	// 将 Role 记录转换为 []string 并赋值给 admin.Roles
-	admin.Roles = make([]interface{}, len(userRoles))
+	admin.Roles = make([]string, len(userRoles))
 	for i, role := range roles {
 		admin.Roles[i] = role.Code
 	}
@@ -81,20 +81,17 @@ func (lr *UserRepository) FindAdminUser(adminUser models.AdminUser) (*models.Adm
 	return &admin, nil
 }
 
-// 前台登录
-func (lr *UserRepository) FindUser(username, password string) (*models.User, error) {
-	var user models.User
-	err := lr.db.Where("username = ? AND password = ?", username, password).First(&user).Error
+// 后台登出
+func (lr *UserRepository) AdminUserLogout(userId int64) error {
+	err := lr.db.Table("admin_users").Where("user_id = ?", userId).Update("login_status", 0).Error
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &user, nil
+	return nil
 }
 
 // 获取路由
-func (lr *UserRepository) GetRoutes(userId int64) ([]models.Router, error) {
-	//var parentRoutes []models.Router
-	//var childRoutes []models.Router
+func (lr *UserRepository) GetRoutes() ([]models.Router, error) {
 	var routes []models.Router
 
 	// 一次性查询所有路由
@@ -136,17 +133,6 @@ func (lr *UserRepository) GetRoutes(userId int64) ([]models.Router, error) {
 			}
 			// 使用缓存中的角色名称列表
 			route.Meta.Roles = roleNamesCache[route.ID]
-			//// 查询权限角色，如果已缓存则直接使用，避免重复查询
-			//if roles, found := roleNamesCache[route.ID]; found {
-			//	route.Meta.Roles = roles
-			//} else {
-			//	roles, err := lr.getRoleNamesFromRoute(route.ID)
-			//	if err != nil {
-			//		return nil, err
-			//	}
-			//	roleNamesCache[route.ID] = roles
-			//	route.Meta.Roles = roles
-			//}
 
 			// 递归地处理子路由的子路由
 			route.Children = lr.buildNestedRoutes(childRouteMap, route.ID, roleNamesCache)
@@ -174,17 +160,6 @@ func (lr *UserRepository) buildNestedRoutes(childRouteMap map[int64][]models.Rou
 
 			// 使用缓存中的角色名称列表
 			route.Meta.Roles = roleNamesCache[route.ID]
-			//// 查询权限角色，如果已缓存则直接使用，避免重复查询
-			//if roles, found := roleNamesCache[route.ID]; found {
-			//	route.Meta.Roles = roles
-			//} else {
-			//	roles, err := lr.getRoleNamesFromRoute(route.ID)
-			//	if err != nil {
-			//		return nil
-			//	}
-			//	roleNamesCache[route.ID] = roles
-			//	route.Meta.Roles = roles
-			//}
 
 			// 递归处理当前路由的子路由
 			route.Children = lr.buildNestedRoutes(childRouteMap, route.ID, roleNamesCache)

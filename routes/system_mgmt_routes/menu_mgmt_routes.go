@@ -1,10 +1,10 @@
-package system_mgt_routes
+package system_mgmt_routes
 
 import (
-	"cook-book-backEnd/controllers/system_mgmt_ctrl"
-	"cook-book-backEnd/respositories"
-	"cook-book-backEnd/respositories/system_mgmt_repo"
-	"cook-book-backEnd/services/system_mgmt_srv"
+	"cook-book-admin-backend/controllers/system_mgmt_ctrl"
+	"cook-book-admin-backend/respositories"
+	"cook-book-admin-backend/respositories/system_mgmt_repo"
+	"cook-book-admin-backend/services/system_mgmt_srv"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,5 +14,5 @@ func SetupMenuMgmtRoutes(r *gin.Engine, rg *gin.RouterGroup) {
 	rg.GET("admin/menu/detail", menuMgmtController.GetMenuDetail)
 	rg.POST("admin/menu/update", menuMgmtController.UpdateMenu)
 	rg.POST("admin/menu/create", menuMgmtController.AddMenu)
-	rg.GET("admin/menu/delete", menuMgmtController.DeleteMenu)
+	rg.GET("admin/menu/delete/:id", menuMgmtController.DeleteMenu)
 }

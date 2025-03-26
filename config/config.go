@@ -11,6 +11,14 @@ type Response struct {
 	Data    interface{} `json:"data"`    // 返回的数据，可以是任意类型
 }
 
+// 定义分页返回格式结构体
+type ListResponse struct {
+	Total       int64       `json:"total"`       // 总数
+	CurrentPage int         `json:"currentPage"` // 当前页码
+	PageSize    int         `json:"pageSize"`    // 每页数量
+	List        interface{} `json:"list"`        // 数据列表
+}
+
 func NewResponse(code int, success bool, message string, data interface{}) *Response {
 	return &Response{
 		Code:    code,

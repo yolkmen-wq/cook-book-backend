@@ -19,22 +19,22 @@ type User struct {
 }
 
 type AdminUser struct {
-	ID          int64         `json:"id" gorm:"column:user_id;primary_key"`
-	Username    string        `json:"username" gorm:"column:username"`
-	Password    string        `json:"password" gorm:"column:password"`
-	Nickname    string        `json:"nickname" gorm:"column:nickname"`
-	Avatar      string        `json:"avatar" gorm:"column:avatar"`
-	Location    string        `json:"location" gorm:"column:location"`
-	IP          string        `json:"ip" gorm:"column:ip"`
-	Os          string        `json:"os" gorm:"column:os"`
-	Browser     string        `json:"browser" gorm:"column:browser"`
-	LoginStatus int           `json:"loginStatus,omitempty" gorm:"column:login_status;default:0"`
-	LoginTime   time.Time     `json:"loginTime" gorm:"column:login_time"`
-	Status      *int          `json:"status,omitempty" gorm:"column:status;default:0"`
-	Createat    *time.Time    `json:"createat" gorm:"column:create_at"`
-	Updatedat   *time.Time    `json:"updatedat" gorm:"column:updated_at"`
-	Roles       []interface{} `json:"roles" gorm:"type:json"`
-	Permissions []string      `json:"permissions" gorm:"type:json"`
+	ID          int64      `json:"id" gorm:"column:user_id;primary_key"`
+	Username    string     `json:"username" gorm:"column:username"`
+	Password    string     `json:"password" gorm:"column:password"`
+	Nickname    string     `json:"nickname" gorm:"column:nickname"`
+	Avatar      string     `json:"avatar" gorm:"column:avatar"`
+	Location    string     `json:"location" gorm:"column:location"`
+	IP          string     `json:"ip" gorm:"column:ip"`
+	Os          string     `json:"os" gorm:"column:os"`
+	Browser     string     `json:"browser" gorm:"column:browser"`
+	LoginStatus int        `json:"loginStatus,omitempty" gorm:"column:login_status;default:0"`
+	LoginTime   time.Time  `json:"loginTime" gorm:"column:login_time"`
+	Status      *int       `json:"status,omitempty" gorm:"column:status;default:0"`
+	Createat    *time.Time `json:"createat" gorm:"column:create_at"`
+	Updatedat   *time.Time `json:"updatedat" gorm:"column:updated_at"`
+	Roles       []string   `json:"roles"  gorm:"type:json"`
+	Permissions []string   `json:"permissions" gorm:"type:json"`
 }
 
 type Permission struct {

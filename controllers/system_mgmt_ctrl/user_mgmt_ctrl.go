@@ -1,12 +1,13 @@
 package system_mgmt_ctrl
 
 import (
-	"cook-book-backEnd/config"
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/services/system_mgmt_srv"
+	"cook-book-admin-backend/config"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/services/system_mgmt_srv"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type UserMgmtController struct {
@@ -19,14 +20,7 @@ func NewUserMgmtController(userMgmtService system_mgmt_srv.UserMgmtService) *Use
 
 // GetUsers 获取用户列表
 func (umc *UserMgmtController) GetUsers(c *gin.Context) {
-	type GetUsersRequest struct {
-		Username string      `json:"username"`
-		Nickname string      `json:"nickname"`
-		Status   interface{} `json:"status,omitempty" `
-		PageNum  int         `json:"pageNum"`
-		PageSize int         `json:"pageSize"`
-	}
-	var getUsersRequest GetUsersRequest
+	var getUsersRequest models.GetUsersRequest
 
 	err := c.ShouldBind(&getUsersRequest)
 	if err != nil {
@@ -35,23 +29,25 @@ func (umc *UserMgmtController) GetUsers(c *gin.Context) {
 		return
 	}
 
-	list, total, err := umc.userMgmtService.GetAdminUserList(getUsersRequest.PageNum, getUsersRequest.PageSize, getUsersRequest.Username, getUsersRequest.Nickname, getUsersRequest.Status)
+	list, total, pageSize, pageNum, err := umc.userMgmtService.GetAdminUserList(getUsersRequest)
 	if err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
 		c.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
 	// 返回数据
-	response := config.NewResponse(http.StatusOK, true, "获取成功", map[string]interface{}{
-		"list":  list,
-		"total": total,
+	response := config.NewResponse(http.StatusOK, true, "获取成功", &config.ListResponse{
+		List:        list,
+		Total:       total,
+		PageSize:    pageSize,
+		CurrentPage: pageNum,
 	})
 	c.JSONP(http.StatusOK, response)
 }
 
 // AddUser 添加用户
 func (umc *UserMgmtController) AddUser(c *gin.Context) {
-	var addUserRequest models.AdminUser
+	var addUserRequest models.AdminUserMgmt
 	err := c.ShouldBind(&addUserRequest)
 	if err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
@@ -71,17 +67,15 @@ func (umc *UserMgmtController) AddUser(c *gin.Context) {
 
 // DeleteUser 删除用户
 func (uc *UserMgmtController) DeleteUser(c *gin.Context) {
-	type DeleteUserRequest struct {
-		ID int64 `json:"id"`
-	}
-	var deleteUserRequest DeleteUserRequest
-	err := c.ShouldBind(&deleteUserRequest)
+	id := c.Param("id")
+	idInt, err := strconv.ParseInt(id, 10, 64)
+
 	if err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
 		c.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
-	err = uc.userMgmtService.DeleteUser(deleteUserRequest.ID)
+	err = uc.userMgmtService.DeleteUser(idInt)
 	// 返回数据
 	if err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)

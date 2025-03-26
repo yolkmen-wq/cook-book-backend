@@ -1,9 +1,9 @@
 package system_mgmt_ctrl
 
 import (
-	"cook-book-backEnd/config"
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/services/system_mgmt_srv"
+	"cook-book-admin-backend/config"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/services/system_mgmt_srv"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -18,7 +18,6 @@ func NewMenuMgmtController(menuMgmtService system_mgmt_srv.MenuMgmtService) *Men
 }
 
 func (m *MenuMgmtController) GetMenus(c *gin.Context) {
-
 	var request models.GetMenuRequest
 	if err := c.ShouldBind(&request); err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
@@ -100,7 +99,7 @@ func (m *MenuMgmtController) UpdateMenu(c *gin.Context) {
 }
 
 func (m *MenuMgmtController) DeleteMenu(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 	if id == "" {
 		errResponse := config.NewResponse(http.StatusBadRequest, false, "参数错误", nil)
 		c.JSON(http.StatusBadRequest, errResponse)

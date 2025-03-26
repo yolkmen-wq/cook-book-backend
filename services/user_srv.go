@@ -1,14 +1,14 @@
 package services
 
 import (
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories"
 )
 
 type UserService interface {
 	AdminLogin(adminUser models.AdminUser) (*models.AdminUser, error)
-	UserLogin(username string, password string) (*models.User, error)
-	GetAsyncRoutes(userId int64) ([]models.Router, error)
+	GetAsyncRoutes() ([]models.Router, error)
+	AdminUserLogout(id int64) error
 }
 
 type userService struct {
@@ -24,12 +24,12 @@ func (us *userService) AdminLogin(adminUser models.AdminUser) (*models.AdminUser
 	return us.userRepo.FindAdminUser(adminUser)
 }
 
-// UserLogin function is used to login user
-func (us *userService) UserLogin(username string, password string) (*models.User, error) {
-	return us.userRepo.FindUser(username, password)
+// AdminUserLogout function is used to logout admin user
+func (us *userService) AdminUserLogout(id int64) error {
+	return us.userRepo.AdminUserLogout(id)
 }
 
 // GetAsyncRoutes function is used to get async routes for user
-func (us *userService) GetAsyncRoutes(userId int64) ([]models.Router, error) {
-	return us.userRepo.GetRoutes(userId)
+func (us *userService) GetAsyncRoutes() ([]models.Router, error) {
+	return us.userRepo.GetRoutes()
 }

@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"context"
-	"cook-book-backEnd/config"
-	"cook-book-backEnd/middlewares"
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/respositories"
-	"cook-book-backEnd/services"
+	"cook-book-admin-backend/config"
+	"cook-book-admin-backend/middlewares"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/respositories"
+	"cook-book-admin-backend/services"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -118,14 +118,8 @@ func (uc *UserController) AdminLogin(c *gin.Context) {
 	c.JSONP(http.StatusOK, response)
 }
 
-// UserLogin 用户登录
-func (uc *UserController) UserLogin(username string, password string) (*models.User, error) {
-	return uc.userService.UserLogin(username, password)
-}
-
 // AdminLogout 管理员登出
 func (uc *UserController) AdminLogout(c *gin.Context) {
-	fmt.Println("AdminLogout")
 	// 解析token
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
@@ -140,6 +134,13 @@ func (uc *UserController) AdminLogout(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
+	// 修改登录状态
+	if err := uc.userService.AdminUserLogout(claims.ID); err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
 	// 删除RefreshToken
 	if err := respositories.RedisClient.Del(ctx, "refreshTokenStr"+strconv.FormatInt(claims.ID, 10)).Err(); err != nil {
 		fmt.Println("删除RefreshToken==err", err)
@@ -151,19 +152,7 @@ func (uc *UserController) AdminLogout(c *gin.Context) {
 
 // GetAsyncRoutes 获取异步路由
 func (uc *UserController) GetAsyncRoutes(c *gin.Context) {
-	fmt.Println("GetAsyncRoutes")
-
-	claims, exists := c.Get("claims")
-	if !exists {
-		fmt.Println(errors.New("未找到认证声明"))
-		return
-	}
-	customClaims, ok := claims.(*models.CustomClaims)
-	if !ok {
-		fmt.Println(errors.New("认证声明类型不匹配"))
-		return
-	}
-	routes, err := uc.userService.GetAsyncRoutes(customClaims.ID)
+	routes, err := uc.userService.GetAsyncRoutes()
 	if err != nil {
 		fmt.Println("GetAsyncRoutes==err", err)
 		c.JSONP(http.StatusInternalServerError, err)

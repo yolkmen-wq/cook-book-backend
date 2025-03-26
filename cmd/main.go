@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cook-book-backEnd/middlewares"
-	_ "cook-book-backEnd/respositories"
-	"cook-book-backEnd/routes"
+	"cook-book-admin-backend/middlewares"
+	_ "cook-book-admin-backend/respositories"
+	"cook-book-admin-backend/routes"
 	"github.com/gin-gonic/gin"
 )
 

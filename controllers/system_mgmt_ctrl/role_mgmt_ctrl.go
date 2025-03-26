@@ -1,10 +1,9 @@
 package system_mgmt_ctrl
 
 import (
-	"cook-book-backEnd/config"
-	"cook-book-backEnd/models"
-	"cook-book-backEnd/services/system_mgmt_srv"
-	"fmt"
+	"cook-book-admin-backend/config"
+	"cook-book-admin-backend/models"
+	"cook-book-admin-backend/services/system_mgmt_srv"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -27,16 +26,18 @@ func (roleMgmtController *RoleMgmtController) GetRoles(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
-	roles, total, err := roleMgmtController.roleMgmtService.GetRoleList(getRolesRequest)
+	roles, total, pageNum, pageSize, err := roleMgmtController.roleMgmtService.GetRoleList(getRolesRequest)
 	if err != nil {
 		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
 		c.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
 	// 返回数据
-	response := config.NewResponse(http.StatusOK, true, "获取成功", map[string]interface{}{
-		"list":  roles,
-		"total": total,
+	response := config.NewResponse(http.StatusOK, true, "获取成功", config.ListResponse{
+		List:        roles,
+		Total:       total,
+		CurrentPage: pageNum,
+		PageSize:    pageSize,
 	})
 	c.JSONP(http.StatusOK, response)
 }
@@ -80,9 +81,7 @@ func (roleMgmtController *RoleMgmtController) CreateRole(c *gin.Context) {
 }
 
 func (roleMgmtController *RoleMgmtController) DeleteRole(c *gin.Context) {
-	fmt.Println("delete role")
-	roleId := c.Query("id")
-	fmt.Println("roleId", roleId)
+	roleId := c.Param("id")
 	if roleId == "" {
 		errResponse := config.NewResponse(http.StatusBadRequest, false, "参数错误", nil)
 		c.JSON(http.StatusBadRequest, errResponse)
@@ -153,5 +152,19 @@ func (roleMgmtController *RoleMgmtController) SaveRoleMenuPermission(c *gin.Cont
 	}
 	// 返回数据
 	response := config.NewResponse(http.StatusOK, true, "保存成功", nil)
+	c.JSONP(http.StatusOK, response)
+}
+
+func (roleMgmtController *RoleMgmtController) GetRoleCanAssignMenuList(c *gin.Context) {
+	menuList, err := roleMgmtController.roleMgmtService.GetRoleCanAssignMenuList()
+	if err != nil {
+		errResponse := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, errResponse)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "获取成功", map[string]interface{}{
+		"list": menuList,
+	})
 	c.JSONP(http.StatusOK, response)
 }

@@ -1,7 +1,7 @@
 package system_mgmt_repo
 
 import (
-	"cook-book-backEnd/models"
+	"cook-book-admin-backend/models"
 	"fmt"
 	"gorm.io/gorm"
 )
