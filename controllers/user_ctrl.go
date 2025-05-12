@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"context"
-	"cook-book-admin-backend/config"
-	"cook-book-admin-backend/middlewares"
-	"cook-book-admin-backend/models"
-	"cook-book-admin-backend/services"
+	"cook-book-backEnd/config"
+	"cook-book-backEnd/middlewares"
+	"cook-book-backEnd/models"
+	"cook-book-backEnd/respositories"
+	"cook-book-backEnd/services"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,6 +21,7 @@ import (
 )
 
 var ctx context.Context
+var cancel context.CancelFunc
 
 type IPInfo struct {
 	Data []map[string]interface{} `json:"data"`
@@ -79,7 +81,7 @@ func (uc *UserController) AdminLogin(c *gin.Context) {
 	}
 
 	// 生成AccessToken
-	tokenStr, err := middlewares.GenerateAccessToken(user.ID, []string{user.Username}, time.Now().Add(time.Hour*1))
+	tokenStr, err := middlewares.GenerateAccessToken(user.ID, []string{user.Username}, time.Now().Add(time.Minute*1))
 	if err != nil {
 		errResp := config.NewResponse(http.StatusInternalServerError, false, "生成AccessToken失败", nil)
 		c.JSON(http.StatusInternalServerError, errResp)
@@ -87,7 +89,7 @@ func (uc *UserController) AdminLogin(c *gin.Context) {
 	}
 
 	// 生成RefreshToken
-	refreshTokenStr, err := middlewares.GenerateAccessToken(user.ID, []string{user.Username}, time.Now().Add(time.Hour*24))
+	refreshTokenStr, err := middlewares.GenerateAccessToken(user.ID, []string{user.Username}, time.Now().Add(time.Hour*24*7))
 	if err != nil {
 		errResp := config.NewResponse(http.StatusInternalServerError, false, "生成RefreshToken失败", nil)
 		c.JSON(http.StatusInternalServerError, errResp)
@@ -96,7 +98,7 @@ func (uc *UserController) AdminLogin(c *gin.Context) {
 	//defer cancel() // 确保在函数结束时取消上下文，释放资源
 
 	// 存储RefreshToken到Redis，注意这里使用了不同的方法名GenerateRefreshToken
-	if err := config.RedisClient.Set(ctx, "refreshTokenStr"+strconv.FormatInt(user.ID, 10), refreshTokenStr, time.Hour*24*7).Err(); err != nil {
+	if err := respositories.RedisClient.Set(ctx, "refreshTokenStr"+strconv.FormatInt(user.ID, 10), refreshTokenStr, time.Hour*24*7).Err(); err != nil {
 		fmt.Println("存储RefreshToken==err", err)
 		errResp := config.NewResponse(http.StatusInternalServerError, false, "存储RefreshToken到Redis失败", nil)
 		c.JSON(http.StatusInternalServerError, errResp)
@@ -116,8 +118,14 @@ func (uc *UserController) AdminLogin(c *gin.Context) {
 	c.JSONP(http.StatusOK, response)
 }
 
+// UserLogin 用户登录
+func (uc *UserController) UserLogin(username string, password string) (*models.User, error) {
+	return uc.userService.UserLogin(username, password)
+}
+
 // AdminLogout 管理员登出
 func (uc *UserController) AdminLogout(c *gin.Context) {
+	fmt.Println("AdminLogout")
 	// 解析token
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
@@ -132,20 +140,38 @@ func (uc *UserController) AdminLogout(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
-	// 修改登录状态
-	if err := uc.userService.AdminUserLogout(claims.ID); err != nil {
-		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
-		c.JSON(http.StatusInternalServerError, response)
-		return
-	}
-
 	// 删除RefreshToken
-	if err := config.RedisClient.Del(ctx, "refreshTokenStr"+strconv.FormatInt(claims.ID, 10)).Err(); err != nil {
+	if err := respositories.RedisClient.Del(ctx, "refreshTokenStr"+strconv.FormatInt(claims.ID, 10)).Err(); err != nil {
 		fmt.Println("删除RefreshToken==err", err)
 	}
 	// 返回数据
 	response := config.NewResponse(http.StatusOK, true, "登出成功", nil)
 	c.JSONP(http.StatusOK, response)
+}
+
+// GetAsyncRoutes 获取异步路由
+func (uc *UserController) GetAsyncRoutes(c *gin.Context) {
+	fmt.Println("GetAsyncRoutes")
+
+	claims, exists := c.Get("claims")
+	if !exists {
+		fmt.Println(errors.New("未找到认证声明"))
+		return
+	}
+	customClaims, ok := claims.(*models.CustomClaims)
+	if !ok {
+		fmt.Println(errors.New("认证声明类型不匹配"))
+		return
+	}
+	routes, err := uc.userService.GetAsyncRoutes(customClaims.ID)
+	if err != nil {
+		fmt.Println("GetAsyncRoutes==err", err)
+		c.JSONP(http.StatusInternalServerError, err)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "获取成功", routes)
+	c.JSON(http.StatusOK, response)
 }
 
 // RefreshToken 刷新token
@@ -169,7 +195,7 @@ func (uc *UserController) AdminRefreshToken(c *gin.Context) {
 
 	var tokenStr string
 	if claims, ok := token.Claims.(*models.CustomClaims); ok {
-		tokenStr, err = middlewares.GenerateAccessToken(claims.ID, claims.Audience, time.Now().Add(time.Hour*1))
+		tokenStr, err = middlewares.GenerateAccessToken(claims.ID, claims.Audience, time.Now().Add(time.Minute*2))
 		if err != nil {
 			fmt.Println("AdminRefreshToken==err", err)
 			errResp := config.NewResponse(http.StatusInternalServerError, false, "token 刷新失败", nil)
@@ -183,7 +209,7 @@ func (uc *UserController) AdminRefreshToken(c *gin.Context) {
 	response := config.NewResponse(http.StatusOK, true, "刷新成功", map[string]interface{}{
 		"accessToken":  tokenStr,
 		"refreshToken": refreshToken.RefreshToken,
-		"expires":      time.Now().Add(time.Hour * 1).Format("2006-01-02 15:04:05"),
+		"expires":      time.Now().Add(time.Minute * 2).Format("2006-01-02 15:04:05"),
 	})
 	c.JSONP(http.StatusOK, response)
 }

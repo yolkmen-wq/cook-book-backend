@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"cook-book-admin-backend/config"
-	"cook-book-admin-backend/models"
+	"cook-book-backEnd/config"
+	"cook-book-backEnd/models"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
