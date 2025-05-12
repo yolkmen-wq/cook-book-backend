@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Carousel struct {
 	ID           int64     `json:"carouselId" gorm:"column:carousel_id;primary_key;"`
@@ -13,12 +15,12 @@ type Carousel struct {
 }
 
 type CarouselItem struct {
-	ID          int64     `json:"carouselItemId" gorm:"column:carousel_item_id;primary_key;"`
+	ID          int64     `json:"carouselItemId" gorm:"column:id;primary_key;"`
 	CarouselID  int64     `json:"carouselId" gorm:"column:carousel_id;not null;foreignKey:carousel_id;"`
 	Name        string    `json:"name" gorm:"column:name;type:varchar(255);not null;"`
-	JumpType    string    `json:"jump_type" gorm:"column:jump_type;type:varchar(255);not null;"`
+	JumpType    string    `json:"jumpType" gorm:"column:jump_type;type:varchar(255);not null;"`
 	ImageURL    string    `json:"imageUrl" gorm:"column:image_url;type:varchar(255);not null;"`
-	KeyWords    string    `json:"keyWords" gorm:"column:key_words;type:varchar(255);not null;"`
+	KeyWord     string    `json:"keyWord" gorm:"column:key_word;type:json;not null;"`
 	Sort        int       `json:"sort" gorm:"column:sort;not null;"`
 	CreatedTime time.Time `json:"createdTime" gorm:"column:created_at;type:datetime;autoCreateTime"`
 	UpdatedTime time.Time `json:"updatedTime,omitempty" gorm:"column:updated_at;type:datetime;autoUpdateTime;"`

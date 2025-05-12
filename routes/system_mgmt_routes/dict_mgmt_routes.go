@@ -1,15 +1,15 @@
 package system_mgmt_routes
 
 import (
+	"cook-book-admin-backend/config"
 	"cook-book-admin-backend/controllers/system_mgmt_ctrl"
-	"cook-book-admin-backend/respositories"
 	"cook-book-admin-backend/respositories/system_mgmt_repo"
 	"cook-book-admin-backend/services/system_mgmt_srv"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupDictMgmtRoutes(r *gin.Engine, rg *gin.RouterGroup) {
-	dictMgmtController := system_mgmt_ctrl.NewDictMgmtController(system_mgmt_srv.NewDictMgmtService(system_mgmt_repo.NewDictMgmtRepository(respositories.DB)))
+	dictMgmtController := system_mgmt_ctrl.NewDictMgmtController(system_mgmt_srv.NewDictMgmtService(system_mgmt_repo.NewDictMgmtRepository(config.DB)))
 	rg.POST("/admin/dict", dictMgmtController.GetDictList)
 	rg.POST("/admin/dict/create", dictMgmtController.CreateDict)
 	rg.POST("/admin/dict/update", dictMgmtController.UpdateDict)

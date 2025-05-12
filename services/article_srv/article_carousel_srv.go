@@ -11,6 +11,9 @@ type CarouselService interface {
 	UpdateCarousel(carousel *models.Carousel) error
 	DeleteCarousel(id int64) error
 	GetCarouselItems(req *models.GetCarouselItemsRequest) ([]models.CarouselItem, int64, int, int, error)
+	CreateCarouselItem(carouselItem *models.CarouselItem) error
+	UpdateCarouselItem(carouselItem *models.CarouselItem) error
+	DeleteCarouselItem(id int64) error
 }
 
 type carouselService struct {
@@ -46,4 +49,19 @@ func (cs *carouselService) DeleteCarousel(id int64) error {
 // GetCarouselItems get carousel items
 func (cs *carouselService) GetCarouselItems(req *models.GetCarouselItemsRequest) ([]models.CarouselItem, int64, int, int, error) {
 	return cs.repo.GetCarouselItems(req)
+}
+
+// CreateCarouselItem create carousel item
+func (cs *carouselService) CreateCarouselItem(carouselItem *models.CarouselItem) error {
+	return cs.repo.CreateCarouselItem(carouselItem)
+}
+
+// UpdateCarouselItem update carousel item
+func (cs *carouselService) UpdateCarouselItem(carouselItem *models.CarouselItem) error {
+	return cs.repo.UpdateCarouselItem(carouselItem)
+}
+
+// DeleteCarouselItem delete carousel item
+func (cs *carouselService) DeleteCarouselItem(id int64) error {
+	return cs.repo.DeleteCarouselItem(id)
 }

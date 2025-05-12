@@ -6,7 +6,7 @@ import (
 )
 
 type ArticleMgmtService interface {
-	GetArticleList() ([]models.Article, error)
+	GetArticleList(req *models.GetArticlesRequest) ([]models.Article, int64, int, int, error)
 	CreateArticle(article models.Article) error
 	//GetArticle(ctx context.Context, id string) (*Article, error)
 	UpdateArticle(article models.Article) error
@@ -24,8 +24,8 @@ func NewArticleMgmtService(repo *article_repo.ArticleMgmtRepository) ArticleMgmt
 }
 
 // GetArticleList returns a list of articles
-func (s *articleMgmtService) GetArticleList() ([]models.Article, error) {
-	return s.repo.GetArticleList()
+func (s *articleMgmtService) GetArticleList(req *models.GetArticlesRequest) ([]models.Article, int64, int, int, error) {
+	return s.repo.GetArticleList(req)
 }
 
 // CreateArticle creates a new article

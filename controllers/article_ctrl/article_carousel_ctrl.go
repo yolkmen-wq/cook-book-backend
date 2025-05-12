@@ -114,3 +114,61 @@ func (cc *CarouselController) GetCarouselItems(c *gin.Context) {
 	response := config.NewResponse(http.StatusOK, true, "获取成功", config.ListResponse{List: carouselItems, Total: total, CurrentPage: pageNum, PageSize: pageSize})
 	c.JSONP(http.StatusOK, response)
 }
+
+func (cc *CarouselController) CreateCarouselItem(c *gin.Context) {
+	var req models.CarouselItem
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	err = cc.carouselSrv.CreateCarouselItem(&req)
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "创建成功", nil)
+	c.JSONP(http.StatusOK, response)
+}
+
+func (cc *CarouselController) UpdateCarouselItem(c *gin.Context) {
+	var carouselItem models.CarouselItem
+	err := c.ShouldBindJSON(&carouselItem)
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	err = cc.carouselSrv.UpdateCarouselItem(&carouselItem)
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "更新成功", nil)
+	c.JSONP(http.StatusOK, response)
+}
+
+func (cc *CarouselController) DeleteCarouselItem(c *gin.Context) {
+	var id = c.Param("id")
+	idInt, err := strconv.ParseInt(id, 10, 64)
+
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	err = cc.carouselSrv.DeleteCarouselItem(idInt)
+	if err != nil {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "删除成功", nil)
+	c.JSONP(http.StatusOK, response)
+}

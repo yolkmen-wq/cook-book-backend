@@ -10,6 +10,7 @@ import (
 func InitRoutes(r *gin.Engine, rg *gin.RouterGroup) {
 	// Add your routes here
 	SetupUserRoutes(r, rg)
+	SetupFileRoutes(r, rg)
 	system_mgmt_routes.SetupUserMgmtRoutes(r, rg)
 	system_mgmt_routes.SetupRoleMgmtRoutes(r, rg)
 	system_mgmt_routes.SetupMenuMgmtRoutes(r, rg)

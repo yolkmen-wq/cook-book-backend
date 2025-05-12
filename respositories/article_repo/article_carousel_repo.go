@@ -117,3 +117,30 @@ func (cr *CarouselRepository) GetCarouselItems(req *models.GetCarouselItemsReque
 
 	return carouselItems, total, req.PageSize, req.PageNum, nil
 }
+
+// CreateCarouselItem 创建轮播图项
+func (cr *CarouselRepository) CreateCarouselItem(carouselItem *models.CarouselItem) error {
+	if err := cr.db.Table("carousel_items").Create(carouselItem).Error; err != nil {
+		fmt.Println("创建轮播图项失败", err)
+		return err
+	}
+	return nil
+}
+
+// UpdateCarouselItem 更新轮播图项
+func (cr *CarouselRepository) UpdateCarouselItem(carouselItem *models.CarouselItem) error {
+	if err := cr.db.Updates(carouselItem).Error; err != nil {
+		fmt.Println("更新轮播图项失败", err)
+		return err
+	}
+	return nil
+}
+
+// DeleteCarouselItem 删除轮播图项
+func (cr *CarouselRepository) DeleteCarouselItem(id int64) error {
+	if err := cr.db.Table("carousel_items").Delete(&models.CarouselItem{}, id).Error; err != nil {
+		fmt.Println("删除轮播图项失败", err)
+		return err
+	}
+	return nil
+}

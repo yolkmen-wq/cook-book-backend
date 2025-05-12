@@ -4,6 +4,7 @@ import (
 	"cook-book-admin-backend/config"
 	"cook-book-admin-backend/models"
 	"cook-book-admin-backend/services/system_mgmt_srv"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -15,6 +16,19 @@ type MenuMgmtController struct {
 
 func NewMenuMgmtController(menuMgmtService system_mgmt_srv.MenuMgmtService) *MenuMgmtController {
 	return &MenuMgmtController{menuMgmtService}
+}
+
+// GetAsyncRoutes 获取异步路由
+func (m *MenuMgmtController) GetAsyncRoutes(c *gin.Context) {
+	routes, err := m.menuMgmtService.GetAsyncRoutes()
+	if err != nil {
+		fmt.Println("GetAsyncRoutes==err", err)
+		c.JSONP(http.StatusInternalServerError, err)
+		return
+	}
+	// 返回数据
+	response := config.NewResponse(http.StatusOK, true, "获取成功", routes)
+	c.JSON(http.StatusOK, response)
 }
 
 func (m *MenuMgmtController) GetMenus(c *gin.Context) {

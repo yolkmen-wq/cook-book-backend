@@ -6,6 +6,7 @@ import (
 )
 
 type MenuMgmtService interface {
+	GetAsyncRoutes() ([]models.Router, error)
 	GetMenuList(searchInfo models.GetMenuRequest) ([]models.Menu, int64, error)
 	GetMenuDetail(id int64) (models.Menu, error)
 	CreateMenu(menu models.Menu) error
@@ -21,6 +22,11 @@ func NewMenuMgmtService(menuMgmtRepo *system_mgmt_repo.MenuMgmtRepository) MenuM
 	return &menuMgmtService{
 		menuMgmtRepo: *menuMgmtRepo,
 	}
+}
+
+// GetAsyncRoutes function is used to get async routes for user
+func (us *menuMgmtService) GetAsyncRoutes() ([]models.Router, error) {
+	return us.menuMgmtRepo.GetRoutesWithLock()
 }
 
 // GetMenu returns the menu of the restaurant

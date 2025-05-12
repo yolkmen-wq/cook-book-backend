@@ -2,6 +2,7 @@ package article_repo
 
 import (
 	"cook-book-admin-backend/models"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -18,34 +19,36 @@ func (r *ArticleCatRepository) CreateArticleCat(articleCat *models.ArticleCatego
 	return r.db.Create(articleCat).Error
 }
 
-//// 根据ID获取文章分类
-//func (r *ArticleCatRepository) GetArticleCatById(id uint) (*models.ArticleCategory, error) {
-//	articleCat := &models.ArticleCategory{}
-//	err := r.db.First(articleCat, id).Error
-//	if err != nil {
-//		return nil, err
-//	}
-//	return articleCat, nil
-//}
-//
-//// 根据名称获取文章分类
-//func (r *ArticleCatRepository) GetArticleCatByName(name string) (*models.ArticleCategory, error) {
-//	articleCat := &models.ArticleCategory{}
-//	err := r.db.Where("name = ?", name).First(articleCat).Error
-//	if err != nil {
-//		return nil, err
-//	}
-//	return articleCat, nil
-//}
-
-// 获取所有文章分类
-func (r *ArticleCatRepository) GetArticleCats() ([]*models.ArticleCategory, error) {
+// 获取文章分类
+func (r *ArticleCatRepository) GetArticleCats(req *models.GetArticleCatsRequest) ([]*models.ArticleCategory, int64, int, int, error) {
 	var articleCats []*models.ArticleCategory
-	err := r.db.Find(&articleCats).Error
-	if err != nil {
-		return nil, err
+	var total int64
+
+	// 构建查询条件
+	db := r.db.Table("article_categories")
+
+	if req.CategoryName != "" {
+		db = db.Where("category_name LIKE ?", "%"+req.CategoryName+"%")
 	}
-	return articleCats, nil
+	// 计算总数
+	if err := db.Count(&total).Error; err != nil {
+		fmt.Println("获取轮播图项总数失败", err)
+		return nil, 0, 0, 0, err
+	}
+
+	// 获取分页轮播图列表
+	if req.PageNum != 0 && req.PageSize != 0 {
+		if err := db.Limit(req.PageSize).Offset((req.PageNum - 1) * req.PageSize).Find(&articleCats).Error; err != nil {
+			fmt.Println("获取轮播图项列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	} else {
+		if err := db.Find(&articleCats).Error; err != nil {
+			fmt.Println("获取轮播图项列表失败", err)
+			return nil, 0, 0, 0, err
+		}
+	}
+	return articleCats, total, req.PageSize, req.PageNum, nil
 }
 
 // 更新文章分类

@@ -4,7 +4,9 @@ import (
 	"cook-book-admin-backend/config"
 	"cook-book-admin-backend/models"
 	"cook-book-admin-backend/services/article_srv"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -37,14 +39,21 @@ func (acc *ArticleCatCtrl) CreateArticleCat(c *gin.Context) {
 }
 
 func (acc *ArticleCatCtrl) GetArticleCatList(c *gin.Context) {
-	articleCats, err := acc.articleCatSrv.GetArticleCats()
+	var req models.GetArticleCatsRequest
+	err := c.ShouldBindJSON(&req)
+	if err != nil && !errors.Is(err, io.EOF) {
+		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	articleCats, total, pageSize, pageNum, err := acc.articleCatSrv.GetArticleCats(&req)
 	if err != nil {
 		response := config.NewResponse(http.StatusInternalServerError, false, err.Error(), nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	// 返回数据
-	response := config.NewResponse(http.StatusOK, true, "获取成功", config.ListResponse{List: articleCats, Total: int64(len(articleCats)), CurrentPage: 1, PageSize: 10})
+	response := config.NewResponse(http.StatusOK, true, "获取成功", config.ListResponse{List: articleCats, Total: total, CurrentPage: pageNum, PageSize: pageSize})
 	c.JSONP(http.StatusOK, response)
 }
 

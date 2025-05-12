@@ -19,16 +19,21 @@ func NewArticleMgmtController(articleService article_srv.ArticleMgmtService) *Ar
 }
 
 func (amc *ArticleMgmtController) GetArticleList(c *gin.Context) {
-	articleList, err := amc.articleService.GetArticleList()
+	var req models.GetArticlesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Println(err)
+		response := config.NewResponse(http.StatusBadRequest, false, "请求参数错误", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	articleList, total, pageSize, pageNum, err := amc.articleService.GetArticleList(&req)
 	if err != nil {
 		response := config.NewResponse(http.StatusInternalServerError, false, "请求参数错误", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	// 返回数据
-	response := config.NewResponse(http.StatusOK, true, "获取成功", map[string]interface{}{
-		"list": articleList,
-	})
+	response := config.NewResponse(http.StatusOK, true, "获取成功", config.ListResponse{List: articleList, Total: total, CurrentPage: pageNum, PageSize: pageSize})
 	c.JSONP(http.StatusOK, response)
 }
 

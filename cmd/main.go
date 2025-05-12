@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "cook-book-admin-backend/config"
 	"cook-book-admin-backend/middlewares"
-	_ "cook-book-admin-backend/respositories"
 	"cook-book-admin-backend/routes"
 	"github.com/gin-gonic/gin"
 )

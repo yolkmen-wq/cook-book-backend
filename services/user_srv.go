@@ -7,7 +7,6 @@ import (
 
 type UserService interface {
 	AdminLogin(adminUser models.AdminUser) (*models.AdminUser, error)
-	GetAsyncRoutes() ([]models.Router, error)
 	AdminUserLogout(id int64) error
 }
 
@@ -27,9 +26,4 @@ func (us *userService) AdminLogin(adminUser models.AdminUser) (*models.AdminUser
 // AdminUserLogout function is used to logout admin user
 func (us *userService) AdminUserLogout(id int64) error {
 	return us.userRepo.AdminUserLogout(id)
-}
-
-// GetAsyncRoutes function is used to get async routes for user
-func (us *userService) GetAsyncRoutes() ([]models.Router, error) {
-	return us.userRepo.GetRoutes()
 }

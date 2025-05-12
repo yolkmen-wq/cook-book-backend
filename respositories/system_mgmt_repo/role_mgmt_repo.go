@@ -1,6 +1,7 @@
 package system_mgmt_repo
 
 import (
+	"context"
 	"cook-book-admin-backend/models"
 	"fmt"
 	"gorm.io/gorm"
@@ -157,6 +158,12 @@ func (lr *RoleMgmtRepository) SaveRoleMenuPermission(roleId int64, menuIds []int
 			fmt.Println("保存角色菜单权限失败", err)
 			return err
 		}
+	}
+	ctx := context.Background()
+	cacheKey := "system:routes:all"
+	err := redisClient.Del(ctx, cacheKey).Err()
+	if err != nil {
+		fmt.Println("删除缓存失败", err)
 	}
 	return nil
 }

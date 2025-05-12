@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"bytes"
+	"cook-book-admin-backend/config"
 	"cook-book-admin-backend/models"
-	"cook-book-admin-backend/respositories"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -38,7 +38,7 @@ func init() {
 	// 启动一个 goroutine 来处理日志记录
 	go func() {
 		for log := range logChan {
-			err := respositories.DB.Create(&log).Error
+			err := config.DB.Create(&log).Error
 			if err != nil {
 				fmt.Println("admin log error", err)
 			}

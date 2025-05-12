@@ -7,7 +7,7 @@ import (
 
 type ArticleCatService interface {
 	CreateArticleCat(articleCat *models.ArticleCategory) error
-	GetArticleCats() ([]*models.ArticleCategory, error)
+	GetArticleCats(req *models.GetArticleCatsRequest) ([]*models.ArticleCategory, int64, int, int, error)
 	UpdateArticleCat(articleCat *models.ArticleCategory) error
 	DeleteArticleCat(id int64) error
 }
@@ -27,8 +27,8 @@ func (acs *articleCatService) CreateArticleCat(articleCat *models.ArticleCategor
 }
 
 // GetArticleCats returns all article categories
-func (acs *articleCatService) GetArticleCats() ([]*models.ArticleCategory, error) {
-	return acs.repo.GetArticleCats()
+func (acs *articleCatService) GetArticleCats(req *models.GetArticleCatsRequest) ([]*models.ArticleCategory, int64, int, int, error) {
+	return acs.repo.GetArticleCats(req)
 }
 
 // UpdateArticleCat updates an existing article category
