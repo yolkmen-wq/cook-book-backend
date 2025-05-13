@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cook-book-backEnd/middlewares"
-	_ "cook-book-backEnd/respositories"
-	"cook-book-backEnd/routes"
+	_ "cook-book-backend/config"
+	"cook-book-backend/middlewares"
+	"cook-book-backend/routes"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +15,6 @@ func main() {
 	// Init routes
 	authorized := router.Group("/")
 	authorized.Use(middlewares.AuthMiddleWare())
-	authorized.Use(middlewares.CommonLogInterceptor)
 	routes.InitRoutes(router, authorized)
-	router.Run(":5757")
+	router.Run(":7575")
 }
