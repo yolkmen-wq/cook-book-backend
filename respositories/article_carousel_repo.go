@@ -14,7 +14,7 @@ func NewArticleCarouselRepo(db *gorm.DB) ArticleCarouselRepo {
 	return ArticleCarouselRepo{db: db}
 }
 
-// 获取文章轮播图列表
+// GetArticleCarouselList 获取文章轮播图列表
 func (repo *ArticleCarouselRepo) GetArticleCarouselList(position int) ([]models.ArticleCarouselItem, error) {
 	var articleCarouselItems []models.ArticleCarouselItem
 	fmt.Println(19, position)

@@ -13,7 +13,7 @@ func NewArticleCateRepo(db *gorm.DB) ArticleCateRepo {
 	return ArticleCateRepo{db: db}
 }
 
-// 获取文章分类列表
+// GetArticleCateList 获取文章分类列表
 func (acr ArticleCateRepo) GetArticleCateList(req *models.GetArticleCateRequest) models.GetArticleCateResponse {
 	var response models.GetArticleCateResponse
 
