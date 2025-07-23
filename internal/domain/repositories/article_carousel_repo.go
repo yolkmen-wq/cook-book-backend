@@ -12,7 +12,7 @@ type ArticleCarouselRepository struct {
 	db *gorm.DB
 }
 
-func NewArticleCarouselRepo(db *gorm.DB) ArticleCarouselRepository {
+func NewArticleCarouselRepository(db *gorm.DB) ArticleCarouselRepository {
 	return ArticleCarouselRepository{db: db}
 }
 

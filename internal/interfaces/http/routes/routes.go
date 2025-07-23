@@ -16,10 +16,10 @@ func Setup(router *gin.Engine, c *container.Container) {
 
 	// 初始化各个路由，使用 container 获取依赖
 	SetupArticleRoutes(router, authorized, c)
-	// SetupArticleCateRoutes(router, authorized, container)
-	// SetupArticleCarouselRoutes(router, authorized, container)
-	// SetupEmojiRoutes(router, authorized, container)
-	// SetupCommentRoutes(router, authorized, container)
+	SetupArticleCateRoutes(router, authorized, c)
+	SetupArticleCarouselRoutes(router, authorized, c)
+	SetupEmojiRoutes(router, authorized, c)
+	SetupCommentRoutes(router, authorized, c)
 	// 如果有用户路由，可以添加 SetupUserRoutes(router, authorized, container)
 }
 

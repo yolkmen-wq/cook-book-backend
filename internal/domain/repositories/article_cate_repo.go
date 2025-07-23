@@ -10,7 +10,7 @@ type ArticleCateRepository struct {
 	db *gorm.DB
 }
 
-func NewArticleCateRepo(db *gorm.DB) ArticleCateRepository {
+func NewArticleCateRepository(db *gorm.DB) ArticleCateRepository {
 	return ArticleCateRepository{db: db}
 }
 

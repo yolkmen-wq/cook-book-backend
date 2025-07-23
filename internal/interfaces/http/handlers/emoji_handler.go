@@ -15,8 +15,8 @@ type EmojiHandler struct {
 	emojiSrv services.EmojiService
 }
 
-func NewEmojiCtrl(emojiSrv services.EmojiService, logger logger.Logger) EmojiHandler {
-	return EmojiHandler{
+func NewEmojiHandler(emojiSrv services.EmojiService, logger logger.Logger) *EmojiHandler {
+	return &EmojiHandler{
 		BaseHandler: NewBaseHandler(logger),
 		emojiSrv:    emojiSrv,
 	}

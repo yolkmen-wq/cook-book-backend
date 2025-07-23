@@ -10,7 +10,7 @@ type EmojiRepository struct {
 	db *gorm.DB
 }
 
-func NewEmojiRepo(db *gorm.DB) EmojiRepository {
+func NewEmojiRepository(db *gorm.DB) EmojiRepository {
 	return EmojiRepository{db: db}
 }
 

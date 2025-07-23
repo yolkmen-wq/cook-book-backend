@@ -13,7 +13,7 @@ type articleCateSrv struct {
 	articleCateRepo repositories.ArticleCateRepository
 }
 
-func NewArticleCateSrv(articleCateRepo repositories.ArticleCateRepository) ArticleCateService {
+func NewArticleCateService(articleCateRepo repositories.ArticleCateRepository) ArticleCateService {
 	return articleCateSrv{
 		articleCateRepo: articleCateRepo,
 	}

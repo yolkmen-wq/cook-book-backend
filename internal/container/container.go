@@ -12,12 +12,12 @@ import (
 
 type Container struct {
 	// Repositories
-	UserRepo        repositories.UserRepository
-	ArticleRepo     repositories.ArticleRepository
-	ArticleCarousel repositories.ArticleCarouselRepository
-	ArticleCate     repositories.ArticleCateRepository
-	Comment         repositories.CommentRepository
-	Emoji           repositories.EmojiRepository
+	UserRepo            repositories.UserRepository
+	ArticleRepo         repositories.ArticleRepository
+	ArticleCarouselRepo repositories.ArticleCarouselRepository
+	ArticleCateRepo     repositories.ArticleCateRepository
+	CommentRepo         repositories.CommentRepository
+	EmojiRepo           repositories.EmojiRepository
 
 	// Services
 	UserService            services.UserService
@@ -40,21 +40,45 @@ func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Contai
 	// 初始化 Repositories
 	userRepo := repositories.NewUserRepository(db)
 	articleRepo := repositories.NewArticleRepository(db)
+	articleCarouselRepo := repositories.NewArticleCarouselRepository(db)
+	articleCateRepo := repositories.NewArticleCateRepository(db)
+	commentRepo := repositories.NewCommentRepository(db)
+	emojiRepo := repositories.NewEmojiRepository(db)
 
 	// 初始化 Services
 	userService := services.NewUserService(userRepo)
 	articleService := services.NewArticleService(articleRepo)
+	articleCarouselService := services.NewArticleCarouselService(articleCarouselRepo)
+	articleCateService := services.NewArticleCateService(articleCateRepo)
+	commentService := services.NewCommentService(commentRepo)
+	emojiService := services.NewEmojiService(emojiRepo)
 
 	// 初始化 Handlers
 	userHandler := handlers.NewUserHandler(userService, logger)
 	articleHandler := handlers.NewArticleHandler(articleService, logger)
+	articleCarouselHandler := handlers.NewArticleCarouselHandler(articleCarouselService, logger)
+	articleCateHandler := handlers.NewArticleCateHandler(articleCateService, logger)
+	commentCateHandler := handlers.NewCommentHandler(commentService, logger)
+	emojiHandler := handlers.NewEmojiHandler(emojiService, logger)
 
 	return &Container{
-		UserRepo:       userRepo,
-		ArticleRepo:    articleRepo,
-		UserService:    userService,
-		ArticleService: articleService,
-		UserHandler:    userHandler,
-		ArticleHandler: articleHandler,
+		UserRepo:               userRepo,
+		ArticleRepo:            articleRepo,
+		ArticleCarouselRepo:    articleCarouselRepo,
+		ArticleCateRepo:        articleCateRepo,
+		CommentRepo:            commentRepo,
+		EmojiRepo:              emojiRepo,
+		UserService:            userService,
+		ArticleService:         articleService,
+		ArticleCarouselService: articleCarouselService,
+		ArticleCateService:     articleCateService,
+		CommentService:         commentService,
+		EmojiService:           emojiService,
+		UserHandler:            userHandler,
+		ArticleHandler:         articleHandler,
+		ArticleCarouselHandler: articleCarouselHandler,
+		ArticleCateHandler:     articleCateHandler,
+		CommentHandler:         commentCateHandler,
+		EmojiHandler:           emojiHandler,
 	}
 }

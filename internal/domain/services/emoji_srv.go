@@ -13,7 +13,7 @@ type emojiSrv struct {
 	emojiRepo repositories.EmojiRepository
 }
 
-func NewEmojiSrv(emojiRepo repositories.EmojiRepository) EmojiService {
+func NewEmojiService(emojiRepo repositories.EmojiRepository) EmojiService {
 	return &emojiSrv{
 		emojiRepo: emojiRepo,
 	}

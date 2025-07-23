@@ -15,8 +15,8 @@ type ArticleCarouselHandler struct {
 	articleCarouselSrv services.ArticleCarouselService
 }
 
-func NewArticleCarouselCtrl(articleCarouselSrv services.ArticleCarouselService, logger logger.Logger) ArticleCarouselHandler {
-	return ArticleCarouselHandler{
+func NewArticleCarouselHandler(articleCarouselSrv services.ArticleCarouselService, logger logger.Logger) *ArticleCarouselHandler {
+	return &ArticleCarouselHandler{
 		BaseHandler:        NewBaseHandler(logger),
 		articleCarouselSrv: articleCarouselSrv,
 	}

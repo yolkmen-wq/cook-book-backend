@@ -20,8 +20,8 @@ type ArticleCateHandler struct {
 	articleCateSrv services.ArticleCateService
 }
 
-func NewArticleCateCtrl(articleCateSrv services.ArticleCateService, logger logger.Logger) ArticleCateHandler {
-	return ArticleCateHandler{
+func NewArticleCateHandler(articleCateSrv services.ArticleCateService, logger logger.Logger) *ArticleCateHandler {
+	return &ArticleCateHandler{
 		BaseHandler:    NewBaseHandler(logger),
 		articleCateSrv: articleCateSrv,
 	}
