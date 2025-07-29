@@ -9,6 +9,7 @@ type CommentService interface {
 	GetCommentList(req *dto.GetCommentRequest) ([]dto.CommentResponse, int64, error)
 	CreateComment(req *dto.CommentResponse) error
 	CreateLike(commentId int64) error
+	DeleteLike(commentId int64) error
 }
 
 type commentService struct {
@@ -34,4 +35,9 @@ func (cr *commentService) CreateComment(req *dto.CommentResponse) error {
 // CreateLike creates a like
 func (cr *commentService) CreateLike(commentId int64) error {
 	return cr.commentRepo.CreateLike(commentId)
+}
+
+// DeleteLike deletes a like
+func (cr *commentService) DeleteLike(commentId int64) error {
+	return cr.commentRepo.DeleteLike(commentId)
 }

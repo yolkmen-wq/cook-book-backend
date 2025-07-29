@@ -20,7 +20,7 @@ func Setup(router *gin.Engine, c *container.Container) {
 	SetupArticleCarouselRoutes(router, authorized, c)
 	SetupEmojiRoutes(router, authorized, c)
 	SetupCommentRoutes(router, authorized, c)
-	// 如果有用户路由，可以添加 SetupUserRoutes(router, authorized, container)
+	SetupUserRoutes(router, authorized, c)
 }
 
 // func InitRoutes(r *gin.Engine, rg *gin.RouterGroup) {

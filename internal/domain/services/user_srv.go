@@ -8,6 +8,7 @@ type UserService interface {
 	//AdminLogin(adminUser models.AdminUser) (*models.AdminUser, error)
 	//UserLogin(username string, password string) (*models.User, error)
 	//GetAsyncRoutes(userId int64) ([]models.Router, error)
+	WechatLogin(code string) (string, error)
 }
 
 type userService struct {
@@ -16,6 +17,10 @@ type userService struct {
 
 func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userService{userRepo: userRepo}
+}
+
+func (us *userService) WechatLogin(code string) (string, error) {
+	return us.userRepo.WechatLogin(code)
 }
 
 //// AdminLogin function is used to login admin user

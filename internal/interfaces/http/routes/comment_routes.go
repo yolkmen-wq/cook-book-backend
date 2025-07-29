@@ -9,5 +9,6 @@ import (
 func SetupCommentRoutes(r *gin.Engine, rg *gin.RouterGroup, container *container.Container) {
 	r.POST("/app/comment/list", container.CommentHandler.GetCommentList)
 	r.POST("/app/comment/create", container.CommentHandler.CreateComment)
-	r.POST("/app/commen/like", container.CommentHandler.LikeComment)
+	r.POST("/app/comment/like/:id", container.CommentHandler.LikeComment)
+	r.POST("/app/comment/unlike/:id", container.CommentHandler.UnlikeComment)
 }

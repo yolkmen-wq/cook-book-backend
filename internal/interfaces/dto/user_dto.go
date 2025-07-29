@@ -7,10 +7,16 @@ import (
 )
 
 type UserResponse struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
-	Avatar   string `json:"avatar"`
+	ID         int64     `json:"id"`
+	Username   string    `json:"username"`
+	Nickname   string    `json:"nickname"`
+	Avatar     string    `json:"avatar"`
+	OpenID     string    `json:"openId"`
+	UnionID    string    `json:"unionId"`
+	Gender     int       `json:"gender"`
+	CreateTime time.Time `json:"createTime" gorm:"column:created_at"`
+	UpdateTime time.Time `json:"updateTime" gorm:"column:updated_at"`
+	Status     int       `json:"status"`
 }
 
 type AdminUserResponse struct {

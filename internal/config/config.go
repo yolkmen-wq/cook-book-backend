@@ -10,6 +10,7 @@ type Config struct {
 	Server   ServerConfig   `json:"server" yaml:"server"`
 	Database DatabaseConfig `json:"database" yaml:"database"`
 	JWT      JWTConfig      `json:"jwt" yaml:"jwt"`
+	Wechat   WechatConfig   `json:"wechat" yaml:"wechat"`
 	Logger   LoggerConfig   `json:"logger" yaml:"logger"` // 添加日志配置
 }
 
@@ -46,6 +47,11 @@ type JWTConfig struct {
 	RefreshTokenDuration time.Duration
 }
 
+type WechatConfig struct {
+	AppID     string
+	AppSecret string
+}
+
 func Load() (*Config, error) {
 	return &Config{
 		Server: ServerConfig{
@@ -64,7 +70,7 @@ func Load() (*Config, error) {
 		},
 		JWT: JWTConfig{
 			SecretKey:            getEnv("JWT_SECRET", "your-secret-key"),
-			AccessTokenDuration:  getDurationEnv("JWT_ACCESS_DURATION", 15*time.Minute),
+			AccessTokenDuration:  getDurationEnv("JWT_ACCESS_DURATION", 24*time.Hour),
 			RefreshTokenDuration: getDurationEnv("JWT_REFRESH_DURATION", 24*time.Hour*7),
 		},
 		Logger: LoggerConfig{
@@ -76,6 +82,10 @@ func Load() (*Config, error) {
 			MaxBackups: getIntEnv("LOG_MAX_BACKUPS", 3),
 			MaxAge:     getIntEnv("LOG_MAX_AGE", 28),
 			// Compress:   parseBoolEnv("LOG_COMPRESS", true),
+		},
+		Wechat: WechatConfig{
+			AppID:     getEnv("WECHAT_APP_ID", "wx602e2e9a008deb2b"),
+			AppSecret: getEnv("WECHAT_APP_SECRET", "65e3fe1540af9fedd4bbeb33de5b6558"),
 		},
 	}, nil
 }

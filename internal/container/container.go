@@ -38,7 +38,7 @@ type Container struct {
 
 func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Container {
 	// 初始化 Repositories
-	userRepo := repositories.NewUserRepository(db)
+	userRepo := repositories.NewUserRepository(db, cfg)
 	articleRepo := repositories.NewArticleRepository(db)
 	articleCarouselRepo := repositories.NewArticleCarouselRepository(db)
 	articleCateRepo := repositories.NewArticleCateRepository(db)

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cookbook-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # 修改为安全密码
+      MYSQL_DATABASE: cook_book
+      MYSQL_USER: root
+      MYSQL_PASSWORD: wuqi9457  # 从您的config.go中提取，实际使用环境变量
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+  redis:
+    image: redis:alpine
+    container_name: cookbook-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+
+  backend:
+    build: .
+    container_name: cookbook-backend
+    environment:
+      - DB_HOST=db  # 指向数据库服务
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=wuqi9457
+      - DB_NAME=cook_book
+      - SERVER_PORT=8080  # 根据您的config调整
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  db-data:

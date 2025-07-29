@@ -31,12 +31,6 @@ func (h *ArticleHandler) GetArticleList(c *gin.Context) {
 	req.CategoryID = h.GetIntQueryParam(c, "categoryId", 0)
 	req.Keyword = h.GetQueryParam(c, "keyword", "")
 
-	// 绑定和验证请求参数
-	if err := h.BindAndValidate(c, &req); err != nil {
-		h.HandleError(c, err, "bind_article_list_params")
-		return
-	}
-
 	// 调用服务层
 	list, total, err := h.articleService.GetArticleList(&req)
 	if err != nil {

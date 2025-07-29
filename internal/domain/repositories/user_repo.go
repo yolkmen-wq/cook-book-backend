@@ -1,15 +1,62 @@
 package repositories
 
 import (
+	"cook-book-backend/internal/config"
+	"cook-book-backend/internal/interfaces/dto"
+	"cook-book-backend/internal/pkg/utils"
+	"fmt"
+	"time"
+
 	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	config *config.Config
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return UserRepository{db: db}
+func NewUserRepository(db *gorm.DB, cfg *config.Config) UserRepository {
+	return UserRepository{
+		db:     db,
+		config: cfg,
+	}
+}
+
+// WechatLogin 微信登录
+func (lr *UserRepository) WechatLogin(code string) (string, error) {
+	// 获取微信用户信息
+	wechatUser, token, err := utils.LoginWithCode(code, utils.WechatConfig{
+		AppID:     lr.config.Wechat.AppID,
+		AppSecret: lr.config.Wechat.AppSecret,
+		JWTConfig: lr.config.JWT,
+	})
+	if err != nil {
+		return "", fmt.Errorf("获取微信用户信息失败: %w", err)
+	}
+
+	var user dto.UserResponse
+	// 查询是否已存在该微信用户
+	err = lr.db.Table("users").Where("open_id = ?", wechatUser.OpenID).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 不存在则创建新用户
+			user = dto.UserResponse{
+				OpenID:     wechatUser.OpenID,
+				UnionID:    wechatUser.UnionID,
+				CreateTime: time.Now(),
+				UpdateTime: time.Now(),
+				Status:     1,
+			}
+
+			if err = lr.db.Table("users").Create(&user).Error; err != nil {
+				return "", fmt.Errorf("创建用户失败: %w", err)
+			}
+		} else {
+			return "", fmt.Errorf("查询用户失败: %w", err)
+		}
+	}
+
+	return token, nil
 }
 
 //

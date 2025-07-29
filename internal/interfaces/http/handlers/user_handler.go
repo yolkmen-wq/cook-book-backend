@@ -3,6 +3,8 @@ package handlers
 import (
 	"cook-book-backend/internal/domain/services"
 	"cook-book-backend/internal/infrastructure/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
@@ -15,6 +17,21 @@ func NewUserHandler(userService services.UserService, logger logger.Logger) *Use
 		BaseHandler: NewBaseHandler(logger),
 		userService: userService,
 	}
+}
+
+// WechatLogin 微信登录
+func (h *UserHandler) WechatLogin(c *gin.Context) {
+	code := h.GetQueryParam(c, "code", "")
+	// 获取客户端信息
+	token, err := h.userService.WechatLogin(code)
+	if err != nil {
+		h.HandleError(c, err, "user_login")
+		return
+	}
+
+	h.Success(c, gin.H{
+		"token": token,
+	})
 }
 
 // // Login 用户登录

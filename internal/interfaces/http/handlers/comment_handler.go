@@ -25,11 +25,6 @@ func NewCommentHandler(commentService services.CommentService, logger logger.Log
 func (h *CommentHandler) GetCommentList(c *gin.Context) {
 	var req dto.GetCommentRequest
 
-	// 设置默认值
-	req.PageNum = h.GetIntQueryParam(c, "pageNum", 1)
-	req.PageSize = h.GetIntQueryParam(c, "pageSize", 10)
-	req.ArticleId = int64(h.GetIntQueryParam(c, "articleId", 0))
-
 	if err := h.BindAndValidate(c, &req); err != nil {
 		h.HandleError(c, err, "bind_comment_list_params")
 		return
@@ -85,21 +80,21 @@ func (h *CommentHandler) LikeComment(c *gin.Context) {
 	h.Success(c, gin.H{"message": "点赞成功"})
 }
 
-// // UnlikeComment 取消点赞
-// func (h *CommentHandler) UnlikeComment(c *gin.Context) {
-// 	commentID, err := h.GetIDParam(c, "id")
-// 	if err != nil {
-// 		h.HandleError(c, err, "get_comment_id_param")
-// 		return
-// 	}
+// UnlikeComment 取消点赞
+func (h *CommentHandler) UnlikeComment(c *gin.Context) {
+	commentID, err := h.GetIDParam(c, "id")
+	if err != nil {
+		h.HandleError(c, err, "get_comment_id_param")
+		return
+	}
 
-// 	if err := h.commentService.UnlikeComment(commentID); err != nil {
-// 		h.HandleError(c, err, "unlike_comment")
-// 		return
-// 	}
+	if err := h.commentService.DeleteLike(commentID); err != nil {
+		h.HandleError(c, err, "unlike_comment")
+		return
+	}
 
-// 	h.Success(c, gin.H{"message": "取消点赞成功"})
-// }
+	h.Success(c, gin.H{"message": "取消点赞成功"})
+}
 
 // // DeleteComment 删除评论
 // func (h *CommentHandler) DeleteComment(c *gin.Context) {
