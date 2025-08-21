@@ -5,41 +5,45 @@ services:
     image: mysql:8.0
     container_name: cookbook-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # 修改为安全密码
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: cook_book
       MYSQL_USER: root
-      MYSQL_PASSWORD: wuqi9457  # 从您的config.go中提取，实际使用环境变量
+      MYSQL_PASSWORD: wuqi9457
     ports:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
     networks:
       - app-network
-  redis:
-    image: redis:alpine
-    container_name: cookbook-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - app-network
-
 
   backend:
     build: .
     container_name: cookbook-backend
     environment:
-      - DB_HOST=db  # 指向数据库服务
+      - DB_HOST=db
       - DB_PORT=3306
       - DB_USERNAME=root
       - DB_PASSWORD=wuqi9457
       - DB_NAME=cook_book
-      - SERVER_PORT=8080  # 根据您的config调整
+      - SERVER_PORT=8080
     ports:
-      - "8080:8080"
+      - "7575:7575"
     depends_on:
       - db
     networks:
       - app-network
+
+  # frontend:
+  #   build: ../cook-book-frontend  # 假设前端项目在相对路径 ../cook-book-frontend，调整为实际绝对路径
+  #   container_name: cookbook-frontend
+  #   ports:
+  #     - "5173:5173"  # 暴露Vite开发服务器
+  #   depends_on:
+  #     - backend  # 前端依赖后端
+  #   networks:
+  #     - app-network
+  #   volumes:
+  #     - ../cook-book-frontend:/app  # 挂载前端代码以支持热重载（开发模式）
 
 networks:
   app-network:

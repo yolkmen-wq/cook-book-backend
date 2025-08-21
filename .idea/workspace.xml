@@ -5,19 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b2bc2a7-ac7a-4241-94a7-4ba79259bc64" name="更改" comment="feat: 移动端新增文章轮播图、最新文章、热门文章模块、文章分类功能">
-      <change afterPath="$PROJECT_DIR$/controllers/comment_ctrl.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/emoji_ctrl.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/comment.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/repositories/comment_repo.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/comment_routes.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/emoji_routes.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/comment_srv.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/emoji_srv.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/emoji.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/emoji.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/repositories/emoji_repo.go" beforeDir="false" afterPath="$PROJECT_DIR$/repositories/emoji_repo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
