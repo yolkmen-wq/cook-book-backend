@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/gorilla/websocket"
 	openai "github.com/sashabaranov/go-openai"
@@ -105,15 +104,13 @@ func (s *OpenAIService) ChatStream(ctx context.Context, message string) (<-chan 
 
 // ChatWebSocket 通过WebSocket进行流式聊天
 func (s *OpenAIService) ChatWebSocket(conn *websocket.Conn, message string) {
-	// 创建上下文，可以通过超时控制
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-	defer cancel()
-
-	// 验证API密钥
 	if s.model == "" {
 		responseError(conn, "OpenAI API configuration is incomplete. Please set AI_API_KEY and AI_MODEL environment variables")
 		return
 	}
+
+	// 创建上下文
+	ctx := context.Background()
 
 	// 创建流式请求
 	stream, err := s.client.CreateChatCompletionStream(
@@ -148,8 +145,7 @@ func (s *OpenAIService) ChatWebSocket(conn *websocket.Conn, message string) {
 			response, err := stream.Recv()
 			if err != nil {
 				if err == io.EOF {
-					// 流结束，发送完成消息
-					sendWSMessage(conn, "done", "")
+					// 流结束
 					return
 				}
 				// 发生错误
@@ -170,18 +166,4 @@ func (s *OpenAIService) ChatWebSocket(conn *websocket.Conn, message string) {
 			}
 		}
 	}
-}
-
-// 发送WebSocket错误消息
-func handleWSError(conn *websocket.Conn, errMsg string) {
-	sendWSMessage(conn, "error", errMsg)
-}
-
-// 发送WebSocket消息
-func responseWSMessage(conn *websocket.Conn, msgType string, content string) error {
-	msg := map[string]string{
-		"type":    msgType,
-		"content": content,
-	}
-	return conn.WriteJSON(msg)
 }

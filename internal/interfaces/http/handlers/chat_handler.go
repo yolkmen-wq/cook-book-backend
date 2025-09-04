@@ -12,6 +12,72 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// chatStreamWithWebSocket 处理WebSocket流式聊天
+func (h *ChatHandler) chatStreamWithWebSocket(ctx context.Context, conn *websocket.Conn, aiService interface{}, message string) {
+	// 根据AI服务类型调用相应的ChatStream方法
+	var respChan <-chan string
+	var errChan <-chan error
+
+	// 类型断言以确定具体的AI服务
+	switch service := aiService.(type) {
+	case services.OpenAIService:
+		respChan, errChan = service.ChatStream(ctx, message)
+	case services.DeepSeekService:
+		respChan, errChan = service.ChatStream(ctx, message)
+	default:
+		h.logger.Error("Unknown AI service type")
+		conn.WriteJSON(map[string]string{
+			"type":    "error",
+			"content": "未知的AI服务类型",
+		})
+		return
+	}
+
+	// 处理流式响应
+	for {
+		select {
+		case <-ctx.Done():
+			// 上下文被取消，发送停止消息并退出
+			h.logger.Info("Chat stream stopped by context cancellation")
+			conn.WriteJSON(map[string]string{
+				"type":    "stop",
+				"content": "聊天已停止",
+			})
+			return
+		case resp, ok := <-respChan:
+			if !ok {
+				// 响应channel关闭，流式响应结束
+				h.logger.Info("Chat stream completed")
+				conn.WriteJSON(map[string]string{
+					"type":    "end",
+					"content": "聊天结束",
+				})
+				return
+			}
+			// 发送响应到客户端
+			if err := conn.WriteJSON(map[string]string{
+				"type":    "message",
+				"content": resp,
+			}); err != nil {
+				h.logger.Error("Failed to write message to WebSocket: " + err.Error())
+				return
+			}
+		case err, ok := <-errChan:
+			if !ok {
+				// 错误channel关闭，流式响应结束
+				return
+			}
+			// 发送错误到客户端
+			h.logger.Error("Chat stream error: " + err.Error())
+			conn.WriteJSON(map[string]string{
+				"type":    "error",
+				"content": err.Error(),
+			})
+			return
+		}
+	}
+}
+
 type ChatHandler struct {
 	*BaseHandler
 	openAIService   services.OpenAIService
@@ -142,6 +208,7 @@ func (h *ChatHandler) ChatWebSocket(c *gin.Context) {
 	type WSMessage struct {
 		Message  string `json:"message"`
 		Provider string `json:"provider"` // 可选参数，指定使用的AI提供商
+		Action   string `json:"action"`   // 操作类型："chat" 或 "stop"
 	}
 
 	// 读取客户端发送的第一条消息
@@ -186,17 +253,43 @@ func (h *ChatHandler) ChatWebSocket(c *gin.Context) {
 		return
 	}
 
-	// 根据请求参数选择AI服务
+	// 创建可取消的上下文
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// 启动goroutine监听后续WebSocket消息（用于停止功能）
+	go func() {
+		for {
+			_, data, err := conn.ReadMessage()
+			if err != nil {
+				// WebSocket连接关闭或出错，取消上下文
+				cancel()
+				return
+			}
+
+			// 尝试解析停止消息
+			var stopMsg WSMessage
+			if err := json.Unmarshal(data, &stopMsg); err == nil {
+				if stopMsg.Action == "stop" {
+					h.logger.Info("Received stop command, canceling chat stream")
+					cancel()
+					return
+				}
+			}
+		}
+	}()
+
+	// 根据请求参数选择AI服务并进行流式聊天
 	switch provider {
 	case "openai":
 		h.logger.Info("Using OpenAI service for WebSocket chat")
-		h.openAIService.ChatWebSocket(conn, messageText)
+		h.chatStreamWithWebSocket(ctx, conn, h.openAIService, messageText)
 	case "deepseek":
 		h.logger.Info("Using DeepSeek service for WebSocket chat")
-		h.deepSeekService.ChatWebSocket(conn, messageText)
+		h.chatStreamWithWebSocket(ctx, conn, h.deepSeekService, messageText)
 	default:
 		// 默认使用DeepSeek服务
 		h.logger.Info("Using default DeepSeek service for WebSocket chat")
-		h.deepSeekService.ChatWebSocket(conn, messageText)
+		h.chatStreamWithWebSocket(ctx, conn, h.deepSeekService, messageText)
 	}
 }

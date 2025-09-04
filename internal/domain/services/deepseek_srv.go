@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/gorilla/websocket"
 	openai "github.com/sashabaranov/go-openai"
@@ -114,15 +113,13 @@ func (s *DeepSeekService) ChatStream(ctx context.Context, message string) (<-cha
 
 // ChatWebSocket 通过WebSocket进行流式聊天
 func (s *DeepSeekService) ChatWebSocket(conn *websocket.Conn, message string) {
-	// 创建上下文，可以通过超时控制
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-	defer cancel()
-
-	// 验证API密钥
 	if s.model == "" {
 		responseError(conn, "AI_API_KEY and AI_MODEL environment variables must be set")
 		return
 	}
+
+	// 创建上下文
+	ctx := context.Background()
 
 	// 创建流式请求
 	stream, err := s.client.CreateChatCompletionStream(
@@ -157,8 +154,7 @@ func (s *DeepSeekService) ChatWebSocket(conn *websocket.Conn, message string) {
 			response, err := stream.Recv()
 			if err != nil {
 				if err == io.EOF {
-					// 流结束，发送完成消息
-					sendWSMessage(conn, "done", "")
+					// 流结束
 					return
 				}
 				// 发生错误
