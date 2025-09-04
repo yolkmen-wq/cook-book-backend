@@ -26,6 +26,7 @@ type Container struct {
 	ArticleCateService     services.ArticleCateService
 	CommentService         services.CommentService
 	EmojiService           services.EmojiService
+	OpenAIService          services.OpenAIService
 
 	// Handlers
 	UserHandler            *handlers.UserHandler
@@ -34,6 +35,7 @@ type Container struct {
 	ArticleCateHandler     *handlers.ArticleCateHandler
 	CommentHandler         *handlers.CommentHandler
 	EmojiHandler           *handlers.EmojiHandler
+	ChatHandler            *handlers.ChatHandler
 }
 
 func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Container {
@@ -52,6 +54,8 @@ func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Contai
 	articleCateService := services.NewArticleCateService(articleCateRepo)
 	commentService := services.NewCommentService(commentRepo)
 	emojiService := services.NewEmojiService(emojiRepo)
+	openAIService := services.NewOpenAIService(cfg.AI.APIKey, cfg.AI.Model)
+	deepSeekService := services.NewDeepSeekService(cfg.AI.APIKey, "deepseek-chat")
 
 	// 初始化 Handlers
 	userHandler := handlers.NewUserHandler(userService, logger)
@@ -60,6 +64,7 @@ func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Contai
 	articleCateHandler := handlers.NewArticleCateHandler(articleCateService, logger)
 	commentCateHandler := handlers.NewCommentHandler(commentService, logger)
 	emojiHandler := handlers.NewEmojiHandler(emojiService, logger)
+	chatHandler := handlers.NewChatHandler(openAIService, deepSeekService, logger)
 
 	return &Container{
 		UserRepo:               userRepo,
@@ -74,11 +79,13 @@ func NewContainer(db *gorm.DB, cfg *config.Config, logger logger.Logger) *Contai
 		ArticleCateService:     articleCateService,
 		CommentService:         commentService,
 		EmojiService:           emojiService,
+		OpenAIService:          openAIService,
 		UserHandler:            userHandler,
 		ArticleHandler:         articleHandler,
 		ArticleCarouselHandler: articleCarouselHandler,
 		ArticleCateHandler:     articleCateHandler,
 		CommentHandler:         commentCateHandler,
 		EmojiHandler:           emojiHandler,
+		ChatHandler:            chatHandler,
 	}
 }

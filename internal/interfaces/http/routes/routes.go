@@ -21,6 +21,7 @@ func Setup(router *gin.Engine, c *container.Container) {
 	SetupEmojiRoutes(router, authorized, c)
 	SetupCommentRoutes(router, authorized, c)
 	SetupUserRoutes(router, authorized, c)
+	SetupAiRoutes(router, authorized, c)
 }
 
 // func InitRoutes(r *gin.Engine, rg *gin.RouterGroup) {

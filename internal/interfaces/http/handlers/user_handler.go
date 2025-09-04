@@ -10,12 +10,14 @@ import (
 type UserHandler struct {
 	*BaseHandler
 	userService services.UserService
+	displayMode int // 页面显示模式控制变量
 }
 
 func NewUserHandler(userService services.UserService, logger logger.Logger) *UserHandler {
 	return &UserHandler{
 		BaseHandler: NewBaseHandler(logger),
 		userService: userService,
+		displayMode: 1, // 默认显示模式为1
 	}
 }
 
@@ -168,3 +170,31 @@ func (h *UserHandler) WechatLogin(c *gin.Context) {
 //     }
 //     return 0
 // }
+
+// GetPageControl 控制页面展示
+func (h *UserHandler) GetPageControl(c *gin.Context){
+	h.Success(c, gin.H{
+		"displayMode": h.displayMode,
+	})
+}
+
+// SetPageControl 设置页面显示模式
+func (h *UserHandler) SetPageControl(c *gin.Context){
+	displayMode := h.GetQueryParam(c, "displayMode", "1")
+	
+	// 将字符串转换为整数
+	if displayMode == "0" {
+		h.displayMode = 0
+	} else if displayMode == "1" {
+		h.displayMode = 1
+	} else if displayMode == "2" {
+		h.displayMode = 2
+	} else {
+		h.displayMode = 1 // 默认值
+	}
+	
+	h.Success(c, gin.H{
+		"message": "页面显示模式设置成功",
+		"displayMode": h.displayMode,
+	})
+}

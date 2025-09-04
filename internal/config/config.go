@@ -12,6 +12,7 @@ type Config struct {
 	JWT      JWTConfig      `json:"jwt" yaml:"jwt"`
 	Wechat   WechatConfig   `json:"wechat" yaml:"wechat"`
 	Logger   LoggerConfig   `json:"logger" yaml:"logger"` // 添加日志配置
+	AI       AIConfig       `json:"ai" yaml:"ai"`
 }
 
 type LoggerConfig struct {
@@ -52,6 +53,12 @@ type WechatConfig struct {
 	AppSecret string
 }
 
+type AIConfig struct {
+	Provider string // 厂商：openai, qwen, glm, wenxin...
+	APIKey   string
+	Model    string
+}
+
 func Load() (*Config, error) {
 	return &Config{
 		Server: ServerConfig{
@@ -86,6 +93,11 @@ func Load() (*Config, error) {
 		Wechat: WechatConfig{
 			AppID:     getEnv("WECHAT_APP_ID", "wx602e2e9a008deb2b"),
 			AppSecret: getEnv("WECHAT_APP_SECRET", "65e3fe1540af9fedd4bbeb33de5b6558"),
+		},
+		AI: AIConfig{
+			Provider: getEnv("AI_PROVIDER", "deepseek"),
+			APIKey:   getEnv("AI_API_KEY", "sk-f342e05fe3294ab8b79aa358b4174f76"),
+			Model:    getEnv("AI_MODEL", "deepseek-chat"),
 		},
 	}, nil
 }

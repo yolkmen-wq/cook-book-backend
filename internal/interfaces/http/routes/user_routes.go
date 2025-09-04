@@ -20,4 +20,6 @@ func SetupUserRoutes(r *gin.Engine, rg *gin.RouterGroup, container *container.Co
 	//rg.GET("/admin/get-async-routes", userController.GetAsyncRoutes)
 	//rg.POST("/admin/logout", userController.AdminLogout)
 	r.POST("/app/wx-login", container.UserHandler.WechatLogin)
+	r.GET("/app/getPageControl", container.UserHandler.GetPageControl)
+	r.POST("/app/setPageControl", container.UserHandler.SetPageControl)
 }
